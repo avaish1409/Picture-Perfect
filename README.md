@@ -10,18 +10,21 @@ This hack can be utilized in:
 - [x] Image expansion is useful in determining the background of the image to grasp important metadata. These can be used in analysis of images from crime scenes, drone captured images for surveilance and so on.
 
 # How to use
-A simple-to-use web imterface will let you analyze any captured image and output relevant suggestions.
+A simple-to-use web interface will let you analyze any captured image and output relevant suggestions.
 
 # How it actually works?
 ## Optimizing image capture
 - Any input image is transformed in respect to image processing vectors (here) into 24 to 96 different versions that could be achieved from given scene.
-- The mentioned variants are produced by implem
-These variants are then sorted on the basis of brisque score for the image (here) and the best variant is chosen as desired image with relevant optimization factor:
+- The mentioned variants are produced by implementation of image transform vectors (here) on the input image
+- These variants are then sorted on the basis of brisque score for the image (here) and the best variant is chosen as desired image with relevant optimization factor:
 
 - ```Optimization factor = image score for best variant/ image score of original image```
 
 ## Image expansion
 Something great coming up here..
+
+## Experimental Results
+To do
 
 # References
 - [Image Transformation, MIT Media Lab]()
