@@ -14,6 +14,11 @@
             height: 100%;
         }
 
+        .flipped {
+            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1);
+        }
+
         #buttons {
             position: absolute;
             bottom: 15px;
@@ -43,22 +48,37 @@
             const devices = await navigator.mediaDevices.enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
             console.log(videoDevices)
+
             var width = 320; // We will scale the photo width to this
             var height = 0; // This will be computed based on the input stream
 
             var streaming = false;
             let localStream = null;
-            const cameraFace = ['environment', 'user']
+            const cameraFace = ['user', 'environment']
             let cameraFaceIndex = 0
-            video = document.getElementById('video');
-            photo = document.getElementById('photo');
-            canvas = document.createElement('canvas');
-            startbutton = document.getElementById('startbutton');
-            clearbutton = document.getElementById('clearbutton');
-
+            const video = document.getElementById('video');
+            const photo = document.getElementById('photo');
+            const canvas = document.createElement('canvas');
+            const startbutton = document.getElementById('startbutton');
+            const clearbutton = document.getElementById('clearbutton');
             const switchCambutton = document.getElementById('switchCamButton')
             switchCamButton.addEventListener('click', switchCamera)
 
+            startbutton.addEventListener('click', function (ev) {
+                takepicture();
+                showImage();
+                ev.preventDefault();
+            });
+
+            clearbutton.addEventListener('click', function (ev) {
+                clearCanvas();
+                showImage();
+                ev.preventDefault();
+            });
+
+            if (videoDevices.length == 1) {
+                switchCamButton.hidden = true
+            }
 
             function clearCanvas() {
                 var context = canvas.getContext('2d');
@@ -89,36 +109,38 @@
             function switchCamera(e) {
                 e.preventDefault()
                 console.log(cameraFaceIndex)
+                startCamera(cameraFace[cameraFaceIndex])
+                cameraFaceIndex = (cameraFaceIndex + 1) % cameraFace.length;
+            }
+
+            switchCamButton.click()
+
+            function startCamera(cameraMode) {
+
                 if (localStream) {
                     for (let track of localStream.getTracks()) {
                         track.stop()
                     }
                 }
-                cameraFaceIndex = (cameraFaceIndex + 1) % cameraFace.length;
-                startup(cameraFace[cameraFaceIndex])
-            }
 
+                if (cameraMode === 'user') {
+                    video.classList.add('flipped')
+                } else {
+                    video.classList.remove('flipped')
+                }
 
-            function startup(cameraMode) {
-
-                console.log(cameraMode)
-
-                navigator
-                    .mediaDevices
-                    .getUserMedia({
-                        video: {
-                            facingMode: cameraMode
-                        },
-                        audio: false
-                    })
-                    .then(function (stream) {
-                        localStream = stream
-                        video.srcObject = stream;
-                        video.play();
-                    })
-                    .catch(function (err) {
-                        console.log("An error occurred: " + err);
-                    });
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: cameraMode
+                    },
+                    audio: false
+                }).then(function (stream) {
+                    localStream = stream
+                    video.srcObject = stream;
+                    video.play();
+                }).catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
 
                 video.addEventListener('canplay', function (ev) {
                     if (!streaming) {
@@ -135,21 +157,7 @@
                         streaming = true;
                     }
                 });
-
-                startbutton.addEventListener('click', function (ev) {
-                    takepicture();
-                    showImage();
-                    ev.preventDefault();
-                });
-
-                clearbutton.addEventListener('click', function (ev) {
-                    clearCanvas();
-                    showImage();
-                    ev.preventDefault();
-                });
             }
-
-            window.addEventListener('load', () => switchCamera);
         })();
     </script>
 </body>
