@@ -51,7 +51,7 @@
                             <img src="" alt="Your Image will be here" id="photo" class="img-fluid w-100 h-100" />
                         </div>
                         <div class="col col-4" id="resultBox">
-                            Here Will be your results
+                            Select Your Option
                         </div>
                     </div>
                 </div>
@@ -75,17 +75,12 @@
 
     <script type="text/javascript">
         async function postData(url = '', data = {}) {
-            // Default options are marked with *
             const response = await fetch(url, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                method: 'POST',
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                redirect: 'follow', // manual, *follow, error
                 body: data // body data type must match "Content-Type" header
             });
-            return response.json(); // parses JSON response into native JavaScript objects
+            return await response.json(); // parses JSON response into native JavaScript objects
         }
     </script>
     <script>
@@ -110,6 +105,10 @@
             const clearbutton = document.getElementById('clearbutton');
             const switchCambutton = document.getElementById('switchCamButton');
 
+            const wywdBtns = document.getElementById('wywdBtns')
+            const resultBox = document.getElementById('resultBox')
+
+
             switchCamButton.addEventListener('click', switchCamera)
 
             capturebutton.addEventListener('click', function (ev) {
@@ -121,6 +120,7 @@
             clearbutton.addEventListener('click', function (ev) {
                 clearCanvas();
                 showImage();
+                resultBox.innerHTML = 'Select Your Option';
                 ev.preventDefault();
             });
 
@@ -209,16 +209,18 @@
             }
 
             // APIS
-
-            const wywdBtns = document.getElementById('wywdBtns')
-            const resultBox = document.getElementById('resultBox')
-            function optimizationApi(e, blob) {
+            const proxy = 'https://cors-anywhere.herokuapp.com/' //CORS Fix required in backend
+            async function optimizationApi(e, blob) {
                 e.preventDefault()
                 wywdBtns.disabled = true
-                createSpinner(resultBox);
-                postData('https://example.com/answer', { imageInput: blob })
+                showSpinner(resultBox);
+                const form = new FormData();
+                form.append('image_input', blob)
+                postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/', form)
                     .then(data => {
-                        console.log(data);
+                        showJSONOutput(resultBox, data)
+                    }).catch((er) => {
+                        showErrorTxt(resultBox, er.message)
                     }).finally(() => {
                         wywdBtns.disabled = false
                     });
@@ -227,20 +229,34 @@
             function transformApi(e, blob) {
                 e.preventDefault();
                 wywdBtns.disabled = true
-                createSpinner(resultBox);
-                postData('https://example.com/answer', { imageInput: blob })
+                showSpinner(resultBox);
+                const form = new FormData();
+                form.append('image_input', blob)
+                postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/expand/', { image_input: blob })
                     .then(data => {
-                        console.log(data);
+                        showJSONOutput(resultBox, data)
+                    }).catch((er) => {
+                        showErrorTxt(resultBox, er.message)
                     }).finally(() => {
                         wywdBtns.disabled = false
                     });
             }
 
-            function createSpinner(element) {
+            function showSpinner(element) {
                 element.innerHTML = `<div class="d-flex justify-content-center align-items-center w-100 h-100">
                     <div class="spinner-border" role="status">
                     </div>
                 </div>`
+            }
+            function showErrorTxt(element, message) {
+                element.innerHTML = `<div class="text-danger">
+                    ${message}
+                </div>`
+            }
+
+            function showJSONOutput(element, json) {
+                element.innerHTML = `<pre><code><div class="text-dark">${JSON.stringify(json, undefined, 4)}
+                </div></code></pre>`
             }
 
             const optimizationBtn = document.getElementById('optimizationBtn');
