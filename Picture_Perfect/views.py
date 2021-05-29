@@ -7,7 +7,7 @@ from django.shortcuts import render
 from utility import adjustment
 
 def home(request):
-  img = request.get['Image']
+  img = request.POST['image_input']
   res = adjustment.cam_adjustment(img)
   print('='*70)
   print('To API: ', res)
