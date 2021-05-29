@@ -39,23 +39,22 @@
         crossorigin="anonymous"></script>
 
     <script>
-
-
         (async function () {
             const devices = await navigator.mediaDevices.enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
+            console.log(videoDevices)
             var width = 320; // We will scale the photo width to this
             var height = 0; // This will be computed based on the input stream
 
             var streaming = false;
-
-            const cameraFace = ['user', 'environment']
+            let localStream = null;
+            const cameraFace = ['environment', 'user']
             let cameraFaceIndex = 0
-            var video = null;
-            var canvas = null;
-            var photo = null;
-            var startbutton = null;
+            video = document.getElementById('video');
+            photo = document.getElementById('photo');
+            canvas = document.createElement('canvas');
+            startbutton = document.getElementById('startbutton');
+            clearbutton = document.getElementById('clearbutton');
 
             const switchCambutton = document.getElementById('switchCamButton')
             switchCamButton.addEventListener('click', switchCamera)
@@ -89,17 +88,20 @@
 
             function switchCamera(e) {
                 e.preventDefault()
+                console.log(cameraFaceIndex)
+                if (localStream) {
+                    for (let track of localStream.getTracks()) {
+                        track.stop()
+                    }
+                }
                 cameraFaceIndex = (cameraFaceIndex + 1) % cameraFace.length;
                 startup(cameraFace[cameraFaceIndex])
             }
 
 
             function startup(cameraMode) {
-                video = document.getElementById('video');
-                photo = document.getElementById('photo');
-                canvas = document.createElement('canvas');
-                startbutton = document.getElementById('startbutton');
-                clearbutton = document.getElementById('clearbutton');
+
+                console.log(cameraMode)
 
                 navigator
                     .mediaDevices
@@ -110,6 +112,7 @@
                         audio: false
                     })
                     .then(function (stream) {
+                        localStream = stream
                         video.srcObject = stream;
                         video.play();
                     })
@@ -146,7 +149,7 @@
                 });
             }
 
-            window.addEventListener('load', () => startup(cameraFace[cameraFaceIndex]));
+            window.addEventListener('load', () => switchCamera);
         })();
     </script>
 </body>
