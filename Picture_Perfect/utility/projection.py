@@ -12,3 +12,4 @@ class Projection:
         plt.imshow(self.img)
         plt.axis('off')
         plt.title(self.title)
+        

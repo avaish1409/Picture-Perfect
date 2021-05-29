@@ -1,5 +1,5 @@
-from .transform import *
-from .projection import *
+from utility.transform import *
+from utility.projection import *
 import sys
 
 def cam_adjustment(path):
@@ -78,7 +78,3 @@ def cam_adjustment(path):
     print('For optimization, you need to :', img_arr[0].title)
     print('Optimization: ', img_arr[0].score/brisque.score(img_input))
     return img_arr[0].title, img_arr[0].score/brisque.score(img_input)
-
-res = cam_adjustment('/home/anirudh/Desktop/aov.png')
-print('='*70)
-print('To API: ', res)
