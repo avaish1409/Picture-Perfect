@@ -215,6 +215,7 @@
             function optimizationApi(e, blob) {
                 e.preventDefault()
                 wywdBtns.disabled = true
+                createSpinner(resultBox);
                 postData('https://example.com/answer', { imageInput: blob })
                     .then(data => {
                         console.log(data);
@@ -226,12 +227,20 @@
             function transformApi(e, blob) {
                 e.preventDefault();
                 wywdBtns.disabled = true
+                createSpinner(resultBox);
                 postData('https://example.com/answer', { imageInput: blob })
                     .then(data => {
                         console.log(data);
                     }).finally(() => {
                         wywdBtns.disabled = false
                     });
+            }
+
+            function createSpinner(element) {
+                element.innerHTML = `<div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <div class="spinner-border" role="status">
+                    </div>
+                </div>`
             }
 
             const optimizationBtn = document.getElementById('optimizationBtn');
