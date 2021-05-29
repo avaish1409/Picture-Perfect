@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <title>Picture Perfect</title>
+    <style>
+        #camera {
+            position: absolute;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+        }
+
+        #buttons {
+            position: absolute;
+            bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="w-100 h-100" id="camera">
+        <video id="video">Video stream not available.</video>
+        <div id="buttons" class="d-flex flex-row justify-content-center w-100">
+            <button id="startbutton" class="btn btn-primary mx-2">Take photo</button>
+            <button id="clearbutton" class="btn btn-danger mx-2">Clear photo</button>
+            <button id="switchCamButton" class="btn btn-warning mx-2">Switch Camera</button>
+        </div>
+    </div>
+
+    <!-- <div class="output mt-4">
+        <img src="" alt="Your Image will be here" id="photo" class="img-thumbnail" />
+    </div> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+        crossorigin="anonymous"></script>
+
+    <script>
+
+
+        (async function () {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+            var width = 320; // We will scale the photo width to this
+            var height = 0; // This will be computed based on the input stream
+
+            var streaming = false;
+
+            const cameraFace = ['user', 'environment']
+            let cameraFaceIndex = 0
+            var video = null;
+            var canvas = null;
+            var photo = null;
+            var startbutton = null;
+
+            const switchCambutton = document.getElementById('switchCamButton')
+            switchCamButton.addEventListener('click', switchCamera)
+
+
+            function clearCanvas() {
+                var context = canvas.getContext('2d');
+                context.fillStyle = "#FFF";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function takepicture() {
+                var context = canvas.getContext('2d');
+                if (width && height) {
+                    canvas.width = width;
+                    canvas.height = height;
+                    context.drawImage(video, 0, 0, width, height);
+                } else {
+                    clearCanvas();
+                }
+            }
+
+            function showImage() {
+                photo.setAttribute('src', getBase64Image());
+            }
+
+            function getBase64Image() {
+                console.log(canvas.toDataURL('image/png'))
+                return canvas.toDataURL('image/png')
+            }
+
+            function switchCamera(e) {
+                e.preventDefault()
+                cameraFaceIndex = (cameraFaceIndex + 1) % cameraFace.length;
+                startup(cameraFace[cameraFaceIndex])
+            }
+
+
+            function startup(cameraMode) {
+                video = document.getElementById('video');
+                photo = document.getElementById('photo');
+                canvas = document.createElement('canvas');
+                startbutton = document.getElementById('startbutton');
+                clearbutton = document.getElementById('clearbutton');
+
+                navigator
+                    .mediaDevices
+                    .getUserMedia({
+                        video: {
+                            facingMode: cameraMode
+                        },
+                        audio: false
+                    })
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function (err) {
+                        console.log("An error occurred: " + err);
+                    });
+
+                video.addEventListener('canplay', function (ev) {
+                    if (!streaming) {
+                        height = video.videoHeight / (video.videoWidth / width);
+
+                        if (isNaN(height)) {
+                            height = width / (4 / 3);
+                        }
+
+                        video.setAttribute('width', width);
+                        video.setAttribute('height', height);
+                        canvas.setAttribute('width', width);
+                        canvas.setAttribute('height', height);
+                        streaming = true;
+                    }
+                });
+
+                startbutton.addEventListener('click', function (ev) {
+                    takepicture();
+                    showImage();
+                    ev.preventDefault();
+                });
+
+                clearbutton.addEventListener('click', function (ev) {
+                    clearCanvas();
+                    showImage();
+                    ev.preventDefault();
+                });
+            }
+
+            window.addEventListener('load', () => startup(cameraFace[cameraFaceIndex]));
+        })();
+    </script>
+</body>
+
+</html>
