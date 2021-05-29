@@ -21,11 +21,15 @@ A simple-to-use web interface will let you analyze any captured image and output
 - ```Optimization factor = image score for best variant/ image score of original image```
 
 ## Image expansion
-Something great coming up here..
+- Any input image is treated as a 50x50 image
+- This image is fed to a KNN model that was trained on a dataset of indoor images
+- The ensemble of such models produces an array of predicted pixels after image expansion
 
 ## Experimental Results
-To do
+- Average image optimisation so far: 1.34
+- Image expansion accuracy (R2-score): 71.49%
 
 # References
-- [Image Transformation, MIT Media Lab]()
-- [Image quality assessment]()
+- [Image Transformation, MIT Media Lab](http://web.media.mit.edu/~maov/classes/comp_photo_vision08f/lect/08_image_warps.pdf)
+- [Image quality assessment](https://pypi.org/project/image-quality/)
+- [Image dataset](http://web.mit.edu/torralba/www/indoor.html)
