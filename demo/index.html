@@ -31,27 +31,38 @@
     <div class="w-100 h-100" id="camera">
         <video id="video">Video stream not available.</video>
         <div id="buttons" class="d-flex flex-row justify-content-center w-100">
-            <button id="startbutton" class="btn btn-primary mx-2" data-bs-toggle="modal"
+            <button id="capturebutton" class="btn btn-primary mx-2" data-bs-toggle="modal"
                 data-bs-target="#exampleModal">Take photo</button>
             <button id="switchCamButton" class="btn btn-warning mx-2">Switch Camera</button>
         </div>
     </div>
 
     <!-- Modal Begin -->
-    <div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal" data-bs-backdrop="static" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Analyze Photo</h5>
+                    <h5 class="modal-title">What Do You Want To Do ?</h5>
                 </div>
-                <div class="modal-body">
-                    <div class="output mt-4">
-                        <img src="" alt="Your Image will be here" id="photo" class="img-fluid" />
+                <div class="modal-body p-1">
+                    <div class="row">
+                        <div class="col col-8">
+                            <img src="" alt="Your Image will be here" id="photo" class="img-fluid w-100 h-100" />
+                        </div>
+                        <div class="col col-4" id="resultBox">
+                            Here Will be your results
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success">Start</button>
-                    <button id="clearbutton" class="btn btn-danger mx-2" data-bs-dismiss="modal">Retake Photo</button>
+                    <fieldset id="wywdBtns">
+                        <button type="button" class="btn btn-success" id="optimizationBtn">Suggest
+                            Optimizations</button>
+                        <button type="button" class="btn btn-success" id="transformBtn">Transform Image</button>
+                        <button id="clearbutton" class="btn btn-danger mx-2" data-bs-dismiss="modal">Retake
+                            Photo</button>
+                    </fieldset>
                 </div>
             </div>
         </div>
@@ -62,6 +73,21 @@
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
 
+    <script type="text/javascript">
+        async function postData(url = '', data = {}) {
+            // Default options are marked with *
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                body: data // body data type must match "Content-Type" header
+            });
+            return response.json(); // parses JSON response into native JavaScript objects
+        }
+    </script>
     <script>
         (async function () {
             const devices = await navigator.mediaDevices.enumerateDevices();
@@ -71,19 +97,22 @@
             var width = 320; // We will scale the photo width to this
             var height = 0; // This will be computed based on the input stream
 
+            let imageBlob = null;
             var streaming = false;
             let localStream = null;
-            const cameraFace = ['user', 'environment']
             let cameraFaceIndex = 0
+
+            const cameraFace = ['user', 'environment']
             const video = document.getElementById('video');
             const photo = document.getElementById('photo');
             const canvas = document.createElement('canvas');
-            const startbutton = document.getElementById('startbutton');
+            const capturebutton = document.getElementById('capturebutton');
             const clearbutton = document.getElementById('clearbutton');
-            const switchCambutton = document.getElementById('switchCamButton')
+            const switchCambutton = document.getElementById('switchCamButton');
+
             switchCamButton.addEventListener('click', switchCamera)
 
-            startbutton.addEventListener('click', function (ev) {
+            capturebutton.addEventListener('click', function (ev) {
                 takepicture();
                 showImage();
                 ev.preventDefault();
@@ -116,13 +145,14 @@
                 }
             }
 
-            function showImage() {
-                photo.setAttribute('src', getBase64Image());
-            }
 
-            function getBase64Image() {
-                console.log(canvas.toDataURL('image/png'))
-                return canvas.toDataURL('image/png')
+            function showImage() {
+                canvas.toBlob(function (blob) {
+                    imageBlob = blob;
+                    URL.revokeObjectURL(photo.src);
+                    url = URL.createObjectURL(blob);
+                    photo.src = url;
+                });
             }
 
             function switchCamera(e) {
@@ -132,7 +162,7 @@
                 cameraFaceIndex = (cameraFaceIndex + 1) % cameraFace.length;
             }
 
-            switchCamButton.click()
+            switchCamButton.click() // Starts the Camera
 
             function startCamera(cameraMode) {
 
@@ -177,6 +207,39 @@
                     }
                 });
             }
+
+            // APIS
+
+            const wywdBtns = document.getElementById('wywdBtns')
+            const resultBox = document.getElementById('resultBox')
+            function optimizationApi(e, blob) {
+                e.preventDefault()
+                wywdBtns.disabled = true
+                postData('https://example.com/answer', { imageInput: blob })
+                    .then(data => {
+                        console.log(data);
+                    }).finally(() => {
+                        wywdBtns.disabled = false
+                    });
+            }
+
+            function transformApi(e, blob) {
+                e.preventDefault();
+                wywdBtns.disabled = true
+                postData('https://example.com/answer', { imageInput: blob })
+                    .then(data => {
+                        console.log(data);
+                    }).finally(() => {
+                        wywdBtns.disabled = false
+                    });
+            }
+
+            const optimizationBtn = document.getElementById('optimizationBtn');
+            const transformBtn = document.getElementById('transformBtn');
+
+            optimizationBtn.addEventListener('click', (e) => optimizationApi(e, imageBlob));
+            transformBtn.addEventListener('click', (e) => transformApi(e, imageBlob));
+
         })();
     </script>
 </body>
