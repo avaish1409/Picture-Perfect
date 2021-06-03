@@ -48,7 +48,7 @@
                 <div class="modal-body p-1">
                     <div class="row">
                         <div class="col col-8">
-                            <img src="" alt="Your Image will be here" id="photo" class="img-fluid w-100 h-100" />
+                            <img src="" alt="Your Image will be here" id="photo" class="img-fluid w-100 h-100"/>
                         </div>
                         <div class="col col-4" id="resultBox">
                             Select Your Option
@@ -68,7 +68,6 @@
         </div>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
@@ -85,7 +84,9 @@
     </script>
     <script>
         (async function () {
-            const devices = await navigator.mediaDevices.enumerateDevices();
+            const devices = await navigator
+                .mediaDevices
+                .enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
             console.log(videoDevices)
 
@@ -107,7 +108,6 @@
 
             const wywdBtns = document.getElementById('wywdBtns')
             const resultBox = document.getElementById('resultBox')
-
 
             switchCamButton.addEventListener('click', switchCamera)
 
@@ -145,7 +145,6 @@
                 }
             }
 
-
             function showImage() {
                 canvas.toBlob(function (blob) {
                     imageBlob = blob;
@@ -173,23 +172,31 @@
                 }
 
                 if (cameraMode === 'user') {
-                    video.classList.add('flipped')
+                    video
+                        .classList
+                        .add('flipped')
                 } else {
-                    video.classList.remove('flipped')
+                    video
+                        .classList
+                        .remove('flipped')
                 }
 
-                navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: cameraMode
-                    },
-                    audio: false
-                }).then(function (stream) {
-                    localStream = stream
-                    video.srcObject = stream;
-                    video.play();
-                }).catch(function (err) {
-                    console.log("An error occurred: " + err);
-                });
+                navigator
+                    .mediaDevices
+                    .getUserMedia({
+                        video: {
+                            facingMode: cameraMode
+                        },
+                        audio: false
+                    })
+                    .then(function (stream) {
+                        localStream = stream
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function (err) {
+                        console.log("An error occurred: " + err);
+                    });
 
                 video.addEventListener('canplay', function (ev) {
                     if (!streaming) {
@@ -209,7 +216,7 @@
             }
 
             // APIS
-            const proxy = '' 
+            const proxy = '' //CORS Fix required in backend
             async function optimizationApi(e, blob) {
                 e.preventDefault()
                 wywdBtns.disabled = true
@@ -219,9 +226,11 @@
                 postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/', form)
                     .then(data => {
                         showJSONOutput(resultBox, data)
-                    }).catch((er) => {
+                    })
+                    .catch((er) => {
                         showErrorTxt(resultBox, er.message)
-                    }).finally(() => {
+                    })
+                    . finally(() => {
                         wywdBtns.disabled = false
                     });
             }
@@ -232,12 +241,14 @@
                 showSpinner(resultBox);
                 const form = new FormData();
                 form.append('image_input', blob)
-                postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/expand/', { image_input: blob })
+                postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/expand/', {image_input: blob})
                     .then(data => {
                         showJSONOutput(resultBox, data)
-                    }).catch((er) => {
+                    })
+                    .catch((er) => {
                         showErrorTxt(resultBox, er.message)
-                    }).finally(() => {
+                    })
+                    . finally(() => {
                         wywdBtns.disabled = false
                     });
             }
