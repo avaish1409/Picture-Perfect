@@ -27,7 +27,7 @@ A simple-to-use web interface will let you analyze any captured image and output
 
 ## Experimental Results
 - Average image optimisation so far: 1.34
-- Image expansion accuracy (R2-score): 71.49%
+- Image expansion accuracy (R2-score): 0.56707639
 
 # References
 - [Image Transformation, MIT Media Lab](http://web.media.mit.edu/~maov/classes/comp_photo_vision08f/lect/08_image_warps.pdf)

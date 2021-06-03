@@ -18,4 +18,5 @@ from django.urls import path
 
 urlpatterns = [
     path('', views.home, name="home"),
+    path('expand/', views.expanded_img, name = 'expanded_img')
 ]
