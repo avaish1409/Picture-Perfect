@@ -27,6 +27,22 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand navbar-light fixed-top bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Picture Perfect</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/avaish1409/Picture-Perfect">Source</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <div class="w-100 h-100" id="camera">
         <video id="video">Video stream not available.</video>
@@ -38,8 +54,8 @@
     </div>
 
     <!-- Modal Begin -->
-    <div class="modal" data-bs-backdrop="static" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal fade" data-bs-backdrop="static" id="exampleModal" tabindex="-1"
+        aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -48,7 +64,7 @@
                 <div class="modal-body p-1">
                     <div class="row">
                         <div class="col col-8">
-                            <img src="" alt="Your Image will be here" id="photo" class="img-fluid w-100 h-100"/>
+                            <img src="" alt="Your Image will be here" id="photo" class="img-fluid w-100 h-100" />
                         </div>
                         <div class="col col-4" id="resultBox">
                             Select Your Option
@@ -56,11 +72,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <fieldset id="wywdBtns">
-                        <button type="button" class="btn btn-success" id="optimizationBtn">Suggest
+                    <fieldset id="wywdBtns" class="d-flex flex-column flex-md-row justify-content-around w-100">
+                        <button type="button" class="btn btn-success btn-sm my-1 my-md-0" id="optimizationBtn">Suggest
                             Optimizations</button>
-                        <button type="button" class="btn btn-success" id="transformBtn">Transform Image</button>
-                        <button id="clearbutton" class="btn btn-danger mx-2" data-bs-dismiss="modal">Retake
+                        <button type="button" class="btn btn-success btn-sm my-1 my-md-0" id="transformBtn">Transform
+                            Image</button>
+                        <button id="clearbutton" class="btn btn-danger btn-sm my-1 my-md-0 mx-2"
+                            data-bs-dismiss="modal">Retake
                             Photo</button>
                     </fieldset>
                 </div>
@@ -230,7 +248,7 @@
                     .catch((er) => {
                         showErrorTxt(resultBox, er.message)
                     })
-                    . finally(() => {
+                    .finally(() => {
                         wywdBtns.disabled = false
                     });
             }
@@ -241,14 +259,14 @@
                 showSpinner(resultBox);
                 const form = new FormData();
                 form.append('image_input', blob)
-                postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/expand/', {image_input: blob})
+                postData(proxy + 'https://codedefy.pythonanywhere.com/picture_perfect/expand/', { image_input: blob })
                     .then(data => {
                         showJSONOutput(resultBox, data)
                     })
                     .catch((er) => {
                         showErrorTxt(resultBox, er.message)
                     })
-                    . finally(() => {
+                    .finally(() => {
                         wywdBtns.disabled = false
                     });
             }
